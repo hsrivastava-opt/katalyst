@@ -1,5 +1,43 @@
 # KATALYST application foundation (Milestone 1)
 
+## Read-only Live voice pilot
+
+Live discovery, a direct connection and a constrained ephemeral-token connection
+succeeded in user-run checks with the free-tier key for `gemini-3.8-live`.
+The read-only panel is deployed and allowlisted. Actual microphone answers and
+speech quality remain unconfirmed; handshake success is not audio acceptance.
+
+The optional project panel uses the Google GenAI JavaScript SDK, Web Audio,
+AudioWorklet and direct browser-to-Gemini streaming. The backend issues one-use,
+short-lived constrained tokens after Firebase ownership and allowlist checks.
+No permanent key goes to the browser. Audio is captured at 16 kHz PCM and replies
+play at the returned PCM sample rate. No video or browser speech-recognition
+provider is used. Status/counts come from a saved server snapshot at session start.
+Requirement dictation and Jira live status are not implemented in this stage.
+
+In the same configured local backend PowerShell terminal:
+
+```powershell
+$env:KATALYST_LIVE_ENABLED = 'true'
+$env:KATALYST_LIVE_MODEL = 'gemini-3.8-live'
+$env:KATALYST_LIVE_ALLOWED_UIDS = $env:KATALYST_JIRA_ALLOWED_UIDS
+```
+
+Reuse the existing privately configured free-tier `GOOGLE_API_KEY` (or explicitly
+set `KATALYST_LIVE_API_KEY` privately). Do not accidentally use the old paid-tier
+local key after replacing only the deployed secret. Restart backend and refresh.
+Production deployment accepts the three pilot variables via `deploy-cloud.ps1`;
+its existing Secret Manager binding supplies `GOOGLE_API_KEY`.
+
+Voice is disabled by default. Even when globally enabled, only explicitly listed
+UIDs can start sessions. One start attempt per account every five minutes is
+enforced transactionally across workers; failed upstream attempts consume the
+slot. The UI ends at most three minutes after token issuance, and any End/error
+releases the microphone. Users must consent to project/audio sharing first.
+Do not log ephemeral tokens, store raw audio or promise that Google does not
+process free-tier data for product improvement. See
+[API scope/limits](API.md#read-only-voice-pilot).
+
 ## Shared SMTP handoff email
 
 Engineering Handoff includes an editable subject/body template, up to 10 registered
@@ -98,7 +136,7 @@ Confirmed SMTP email handoff is also available via a shared backend sender;
 Gmail OAuth is not implemented.
 
 Not implemented: DOCX,
-Gmail, Stitch, architecture agents, Jira sprint/status synchronization, durable background jobs, transactional
+per-user Gmail OAuth, Stitch, architecture agents, Jira sprint/status synchronization, durable background jobs, transactional
 concurrent editing, pagination, tenant organisations or production certification.
 AI generation is still explicitly invoked in the existing workspace, not
 automatically launched on project creation. Do not label prototype progress as
@@ -193,8 +231,8 @@ duplicates; see [reconciliation and limits](API.md#jira-cloud-rest-handoff).
 
 Set these in the **backend process environment**. No frontend environment file or
 Firebase credentials baked into the bundle are needed: `/api/config` serves only
-the public web configuration. The organisation-excluded environment-template file
-was not read or modified.
+the public web configuration. Environment files are not automatically loaded;
+all required names and configuration examples are documented here.
 
 | Variable | Purpose |
 |---|---|
@@ -315,14 +353,14 @@ UIUX_PROMPT_REVIEW → UIUX_PROMPT_APPROVED → UIUX_DESIGN_REVIEW →
 UIUX_DESIGN_APPROVED → TECHNICAL_CLARIFICATION → ARCHITECTURE_REVIEW →
 ARCHITECTURE_APPROVED → BACKLOG_REVIEW → BACKLOG_APPROVED → JIRA_INTEGRATION →
 PLANNING_COMPLETED. The optional SRS branch already supports a revision loop and
-PDF download after approval, independently of the prototype gates. Other reviews
-and email remain planned; external email/Jira writes require separate
-explicit confirmation and idempotency keys.
+PDF download after approval, independently of the prototype gates. Architecture
+and additional reviews remain planned; implemented SMTP email/Jira writes require
+separate explicit confirmation and durable delivery claims.
 
-Later integration prerequisites: verified supported Stitch MCP/API or a labeled
-manual import workflow; Gmail OAuth consent/scopes and user confirmation; Jira
-OAuth/token, instance/project permissions and documented REST/MCP contracts.
-None is represented as a completed external operation by Milestone 1.
+Future integration prerequisites include verified Stitch API support or a labeled
+manual import workflow, per-user Gmail OAuth consent/scopes and Jira OAuth.
+Current shared-account SMTP and Jira REST are implemented and independently
+configured; they do not imply those future OAuth integrations exist.
 
 ## Verification
 

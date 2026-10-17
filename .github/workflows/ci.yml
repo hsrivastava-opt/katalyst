@@ -21,3 +21,4 @@ jobs:
           node-version: '22'
       - run: cd frontend && npm ci --no-audit --no-fund
       - run: cd frontend && npm run build
+      - run: cd frontend && node --test tests/voice-audio.test.cjs

@@ -64,6 +64,10 @@
 .email-handoff textarea, .email-handoff input:not([type=checkbox]) { box-sizing: border-box; width: 100%; min-width: 0; }
 .email-handoff .story-card { margin-top: 20px; }
 .email-handoff .srs-controls > small { display: block; margin: 16px 0; }
+.voice-panel { margin: 20px 0; min-width: 0; overflow-wrap: anywhere; }
+.voice-panel h3 { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; }
+.voice-actions { display: flex; flex-wrap: wrap; gap: 12px; margin: 16px 0; }
+.voice-transcript { max-height: 280px; overflow: auto; white-space: pre-wrap; }
 @media (max-width: 800px) {
   .landing-layout { grid-template-columns: 1fr; gap: 28px; }
   .auth-header { margin-bottom: 36px; }

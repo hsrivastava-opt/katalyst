@@ -10,9 +10,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pydantic import ValidationError
 import fitz
-from . import store, ai, auth, workflow, srs, jira, handoff_email
+from . import store, ai, auth, workflow, srs, jira, handoff_email, voice
 from .models import ProjectCreate, RequirementsUpdate, StoriesUpdate, ApprovalCreate, DemoAction, Requirement, Story, PrototypeSpec, PrototypeUpdate, validate_prototype
-from .models import SRSGenerate, SRSUpdate, JiraCreate, HandoffEmailDraft, HandoffEmailSend
+from .models import SRSGenerate, SRSUpdate, JiraCreate, HandoffEmailDraft, HandoffEmailSend, VoiceStart
 
 MAX_UPLOAD=6_000_000
 
@@ -72,6 +72,7 @@ def health():return {'status':'ok','service':'KATALYST','time':now()}
 
 @app.get('/api/config')
 def config():return {**ai.provider_info(),'demo_auth_only':auth.mode()=='demo',
+                     'live_voice_enabled':voice.enabled(),
                      'auth_mode':auth.mode(),'firebase':auth.public_config() if auth.mode()=='firebase' else None,
                      'scope':'foundation + prototype workflow + optional SRS review/PDF + confirmed Jira REST and SMTP handoff; Gmail OAuth/architecture/sprint automation pending'}
 
@@ -96,6 +97,11 @@ def create(body: ProjectCreate,user_id: str = Depends(auth.current_user)):
 
 @app.get('/api/projects/{pid}')
 def get_project(pid:str,user_id:str=Depends(auth.current_user)):return read_project(pid,user_id)
+
+@app.post('/api/projects/{pid}/voice/session')
+def start_voice(pid:str,body:VoiceStart,user_id:str=Depends(auth.current_user)):
+    p=read_project(pid,user_id)
+    return JSONResponse(content=voice.start(p,user_id),headers={'Cache-Control':'no-store','Pragma':'no-cache'})
 
 @app.post('/api/projects/{pid}/sources')
 async def upload_source(pid:str, file:UploadFile=File(...),user_id:str=Depends(auth.current_user)):

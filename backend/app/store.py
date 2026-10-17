@@ -3,7 +3,7 @@
 Use KATALYST_STORE=firestore on Cloud Run. All project queries are owner-filtered.
 Artifact subcollections and transactional editing remain future milestones.
 """
-import json, logging, os, sqlite3
+import hashlib, json, logging, os, sqlite3
 from contextlib import contextmanager
 from pathlib import Path
 from threading import RLock
@@ -60,6 +60,7 @@ def initialize():
         db.execute('CREATE TABLE IF NOT EXISTS users (uid TEXT PRIMARY KEY, body TEXT NOT NULL)')
         db.execute('CREATE TABLE IF NOT EXISTS jira_deliveries (id TEXT PRIMARY KEY, project_id TEXT NOT NULL, body TEXT NOT NULL)')
         db.execute('CREATE TABLE IF NOT EXISTS email_deliveries (id TEXT PRIMARY KEY, project_id TEXT NOT NULL, body TEXT NOT NULL)')
+        db.execute('CREATE TABLE IF NOT EXISTS voice_sessions (uid TEXT PRIMARY KEY, last_started REAL NOT NULL)')
 
 def save(project):
     if _is_firestore():
@@ -150,3 +151,32 @@ def finish_delivery(kind, key, entry):
         return
     with LOCK, sqlite3.connect(_path()) as db:
         db.execute(f'UPDATE {kind}_deliveries SET body=? WHERE id=?', (json.dumps(entry), key))
+
+
+def claim_voice_slot(uid, timestamp, cooldown):
+    """One bounded cooldown record per identity, independent of project edits."""
+    if _is_firestore():
+        from google.cloud import firestore
+        key = hashlib.sha256(uid.encode()).hexdigest()
+        with cloud_operation():
+            client = firestore_client()
+            reference = client.collection(os.getenv('KATALYST_FIRESTORE_COLLECTION', 'katalyst_projects')).document(
+                '_voice_sessions').collection('entries').document(key)
+
+            @firestore.transactional
+            def claim(transaction):
+                snapshot = reference.get(transaction=transaction)
+                if snapshot.exists and snapshot.to_dict()['last_started'] > timestamp - cooldown:
+                    return False
+                transaction.set(reference, {'last_started': timestamp})
+                return True
+
+            return claim(client.transaction())
+    with LOCK, sqlite3.connect(_path()) as db:
+        cursor = db.execute(
+            'INSERT INTO voice_sessions(uid,last_started) VALUES(?,?) '
+            'ON CONFLICT(uid) DO UPDATE SET last_started=excluded.last_started '
+            'WHERE voice_sessions.last_started<=?',
+            (uid, timestamp, timestamp - cooldown),
+        )
+        return cursor.rowcount == 1

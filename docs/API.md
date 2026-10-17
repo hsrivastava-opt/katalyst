@@ -36,6 +36,82 @@ See [SMTP setup/reconciliation](FOUNDATION_SETUP.md#shared-smtp-handoff-email).
 
 ## Endpoint reference
 
+### Live voice assistant discovery
+
+`backend/check_live.py` performs opt-in Gemini model discovery using the existing
+SDK. It selects models advertising `bidiGenerateContent`, not names guessed from
+text-generation models. It never creates voice sessions or tokens, generates
+content, or submits project data. Listing a model does not prove free-tier pricing,
+quota availability or connection access. Discovery is separate from the opt-in
+voice pilot below.
+
+In your own PowerShell terminal at the repository root, inspect candidates using
+the privately stored free-tier key without printing it or putting it in arguments:
+
+```powershell
+gcloud secrets versions access 3 --secret=katalyst-gemini-api-key --project=katalyst-b780e --quiet | & .\.venv-live\Scripts\python.exe .\backend\check_live.py --key-stdin
+```
+
+This example pins the uploaded free-tier credential version 3; change the version
+only deliberately. Do not share the secret value. Check the CLI exit status/error
+as well as model discovery output. Review Live pricing and the key project's AI
+Studio limits before an explicit connection test. Live voice will require separate
+model configuration, short-lived credentials, owner-checked data tools and bounded
+sessions; current text-generation access alone is insufficient.
+
+After confirming the selected model's pricing, append
+`--connect-test --model gemini-3.8-live` to explicitly open and close one Live
+connection (20-second handshake timeout). This opt-in check submits no prompts,
+audio, project evidence or tokens. It verifies session setup only, not audio
+responses or tool calls. Discovery remains the default and never opens a session.
+
+Use `--ephemeral-test --model gemini-3.8-live` instead to explicitly test the same
+locked ephemeral credentials as the browser pilot, with synthetic instructions
+only (no microphone, real project evidence, replies or printed credentials).
+The installed browser SDK flags ephemeral support as experimental and supports
+the `v1alpha` constrained connection; the pilot/token diagnostic explicitly use
+that version, separately from ordinary model discovery.
+
+### Read-only voice pilot
+
+`POST /api/projects/{id}/voice/session` with `{confirmed: true}` requires Firebase
+authentication, project ownership, `KATALYST_LIVE_ENABLED=true` and membership in
+`KATALYST_LIVE_ALLOWED_UIDS`. The model defaults to `gemini-3.8-live` (override
+`KATALYST_LIVE_MODEL` explicitly). Credentials come from `KATALYST_LIVE_API_KEY`,
+then `GOOGLE_API_KEY`, then `GEMINI_API_KEY`. Demo auth never issues real tokens.
+
+The `Cache-Control: no-store` response includes a short-lived `auth_tokens/...`
+token, model/API version, expiry, snapshot time and context. Never log or persist
+the token. The permanent key is never returned. Token constraints: one session,
+45 seconds to start, 180 seconds credential lifetime, audio replies, transcripts,
+no tools, 1024 maximum output tokens per turn and a grounded read-only project
+snapshot. All Live configuration fields are locked using the token API defaults.
+The UI ends at credential expiry and does not resume or automatically reconnect.
+
+The snapshot includes title/ID, stage/status, prototype-only progress, exact
+artifact counts/versions, current approval decisions, optional SRS presence/approval,
+requirements/stories and open questions. Raw uploads, client contact metadata,
+audit logs and SRS bodies are excluded. If context exceeds 60,000 UTF-8 bytes,
+detailed artifact text/questions are explicitly omitted while preserving exact
+counts. It is not continuously refreshed or live Jira status. There are no voice
+mutation APIs, general task backlog or voice drafts in this stage.
+
+The per-UID atomic cooldown allows one token attempt every 300 seconds across
+projects/workers. Failed token requests consume the slot; no blind retries.
+One timestamp per UID is stored in SQLite `voice_sessions` or Firestore
+`{project_collection}/_voice_sessions/entries/{sha256(uid)}` using a transaction.
+Tokens/audio/transcripts are not stored there. This bounds issuance, not spending;
+trusted-user allowlisting remains required.
+
+Microphone tracks, worklet, playback, WebSocket and timers are released on End,
+error, timeout, page exit or unmount. Interruptions cancel queued playback; audio
+falling more than eight seconds behind explicitly stops the session. Transcripts
+show at most 40 blocks / 6,000 characters each and are local to the panel.
+Use a recent browser with HTTPS/localhost, AudioWorklet and microphone permission.
+Consent precedes microphone and snapshot sharing. Free-tier Google API data-use
+terms apply; do not use confidential data during evaluation. Replies/transcripts
+can be incorrect and should be checked against saved artifacts.
+
 | Method | Path | Purpose |
 |---|---|---|
 | GET | `/api/health` | Liveness check |
@@ -44,6 +120,7 @@ See [SMTP setup/reconciliation](FOUNDATION_SETUP.md#shared-smtp-handoff-email).
 | GET | `/api/projects` | Only the authenticated owner's summaries, stage, progress and resume tab |
 | POST | `/api/projects` | `{title,brief,description?,business_domain?,client_name?,client_email?,expected_timeline?,additional_notes?}`; owner assigned from verified UID |
 | GET | `/api/projects/{id}` | Read project, all artifacts and status |
+| POST | `/api/projects/{id}/voice/session` | `{confirmed:true}`; owner-checked constrained ephemeral token for read-only voice pilot |
 | POST | `/api/projects/{id}/sources` | `multipart/form-data` file upload, PDF/TXT/MD |
 | POST | `/api/projects/{id}/requirements/analyze` | Extract requirements, questions and conflicts |
 | PUT | `/api/projects/{id}/requirements` | `{requirements, open_questions}`; increments version and invalidates gates |

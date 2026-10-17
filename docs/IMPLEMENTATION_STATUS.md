@@ -1,6 +1,42 @@
 # Implementation status
 
-Updated: October 17, 2026
+Updated: October 18, 2026
+
+## Hosted submission status
+
+Live URL: https://katalyst-mvp-861461836467.asia-south1.run.app/
+Public source: https://github.com/hsrivastava-opt/katalyst
+
+Cloud Run source deployment completed, including the read-only voice panel.
+Revision `katalyst-mvp-00004-b5q` was verified serving 100% of traffic before this
+documentation update. The service uses Firebase auth, Firestore, Gemini Developer
+API, pinned Secret Manager credentials and explicit voice/Jira/email UID gates.
+Health, configuration, worklet delivery and anonymous project/voice rejection
+were checked independently. Hosted feature acceptance after the Gemini key
+replacement remains pending; health alone is not end-to-end inference evidence.
+
+## Read-only Live voice pilot
+
+Added a disabled-by-default voice panel with explicit consent, permanent-key-free
+browser streaming via constrained ephemeral credentials, server-derived project
+snapshot/counts, transcripts, interruptible audio, three-minute credential/UI
+expiry and transactional per-UID five-minute issuance cooldown.
+There are no voice mutations or live Jira status reads in this stage.
+User confirmed model discovery, direct Live handshake and constrained ephemeral
+connection with `gemini-3.8-live`. The panel is deployed and the requested pilot
+account was added to the allowlist. Actual microphone responses and voice quality
+remain pending. See [pilot setup](FOUNDATION_SETUP.md#read-only-live-voice-pilot).
+
+Latest publication validation: **222 backend tests passed**, with three non-failing
+dependency/experimental API warnings. A clean `npm ci` and TypeScript/Vite
+production build passed. Relative documentation file links, deployment-script
+PowerShell syntax and `git diff --check` also passed. Six browser-audio
+unit tests cover PCM conversion, worklet batching, playback queue bounds and
+microphone/context release including late permission after cancellation.
+Production frontend build passes. Isolated browser smoke used synthetic audio,
+fake ephemeral tokens and a fake Live WebSocket (no Google generation): consent
+guard, setup, transcript/PCM handling, navigation blocking, End cleanup, token
+failure cleanup, simulated credential expiry and 470px layout all passed.
 
 ## Confirmed SMTP handoff addition
 
@@ -9,7 +45,8 @@ recipient validation through Firebase Admin, current approved ZIP attachment,
 preview/explicit confirmation, mandatory TLS, trusted-sender UID allowlisting and
 a durable independent delivery ledger. Duplicate identical sends are skipped;
 pending/uncertain outcomes require administrator reconciliation. SMTP acceptance
-does not prove inbox delivery. Live SMTP credentials/delivery remain unverified.
+does not prove inbox delivery. The user subsequently confirmed receiving a real
+Gmail message and checking the correct ZIP attachment during live-service testing.
 See [SMTP setup and limits](FOUNDATION_SETUP.md#shared-smtp-handoff-email).
 
 User-reported live acceptance checks on October 17: Jira Story creation and link
@@ -30,7 +67,7 @@ model, state-machine boundaries and cloud setup.
 
 ## Verified locally
 
-- **193 backend tests pass** after SMTP handoff implementation, including the
+- The SMTP milestone passed **193 backend tests**, including the
   existing 160 cases plus registered-recipient, sender authorization, confirmation,
   stale-snapshot, exact ZIP/SRS attachment, TLS/MIME/Bcc, duplicate/concurrent
   claim, Firestore email ledger and uncertain-outcome regressions.
@@ -75,7 +112,8 @@ model, state-machine boundaries and cloud setup.
   resolution and mocked transport: editable template, preview invalidation after
   edits, explicit-confirmation guard, cancel-navigation retaining draft, accepted
   status, reload/same-draft delivery recovery, duplicate-button prevention and
-  470px layout without horizontal overflow. No external email was sent.
+  470px layout without horizontal overflow. No external email was sent by this
+  mocked browser check; later user-run SMTP receipt was separately confirmed.
 
 ## Jira handoff milestone
 
@@ -119,27 +157,29 @@ authenticated and ownership-checked and require no model calls. Prototype
 editing preserves the fixed three-screen renderer and checklist actions.
 See [API.md](API.md#manual-artifact-editing) for contracts and invalidation rules.
 
-Two dependency warnings remain (Starlette/AnyIO deprecation and a Google Cloud
-Storage future compatibility warning). They did not fail the suite.
+Known non-failing warnings include Starlette/AnyIO deprecation, a Google Cloud
+Storage compatibility warning and the experimental ephemeral-token SDK warning.
 
 ## Live-service verification boundaries
 
 - Earlier user-reported checks confirmed Firebase registration/login/Google
   sign-in, private project persistence and real Gemini prototype generation.
   These are manual confirmations, not independently inspected cloud evidence.
-- Real ADK execution, systematic cross-domain usefulness evaluation, and the new
-  SRS flow with real Gemini/Firestore still require verification.
+- The user also confirmed real SRS generation, revisions, PDF/handoff and real
+  SMTP attachment receipt. These are manual confirmations, not independent inspection.
+- Real ADK execution and systematic cross-domain usefulness evaluation still
+  require verification.
 - Firestore rules deployment/IAM have not been independently verified.
-- Cloud Storage uploads, Cloud Run deployment or an actual Docker image build.
+- Cloud Storage archival remains unverified. Cloud Run source/Docker builds and
+  deployment are now completed; that does not imply load or full hosted acceptance.
 
-Successful mocks are not cloud evidence. No credentials are embedded in source.
-The environment-template file restricted by organisation policy was not read or
-modified.
+Successful mocks are not cloud evidence. Credentials and local databases are
+excluded from publication. All setup requirements are documented without
+depending on an environment-template file.
 
 ## Future product milestones
 
-DOCX extraction; client email preview and
-Gmail; UI/UX analysis, prompts and supported Stitch integration/manual import;
+DOCX extraction; per-user Gmail OAuth; UI/UX analysis, prompts and supported Stitch integration/manual import;
 technical clarifications and architecture; backlog/sprint planning; Jira
 OAuth/sprint assignment/status synchronization and automated reconciliation;
 durable background execution and production hardening.

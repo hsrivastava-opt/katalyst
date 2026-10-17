@@ -11,6 +11,7 @@ import {RequirementsEditor,StoriesEditor,PrototypeEditor} from './ArtifactEditor
 import SrsPanel from './SrsPanel'
 import JiraPanel from './JiraPanel'
 import EmailHandoffPanel from './EmailHandoffPanel'
+import VoicePanel from './VoicePanel'
 
 const phases=[{id:'capture',title:'Requirement Intake',number:'01',icon:FileText},{id:'stories',title:'Stories & Criteria',number:'02',icon:ClipboardCheck},{id:'prototype',title:'Live Prototype',number:'03',icon:Layers},{id:'handoff',title:'Engineering Handoff',number:'04',icon:PackageOpen}] as const
 type Tab=typeof phases[number]['id']
@@ -84,6 +85,7 @@ function Workspace({session,config}:{session:Session;config:Config}){
        <div className="page-heading"><div><div className="overline"><span className="square-dot"/> LIVE PROJECT WORKSPACE</div><h1>{project.title}</h1><p>From unstructured business intent to a reviewable and executable experience.</p></div><div className="project-meta"><span className="id-pill">{project.id}</span><Status done={Boolean(g2)} label={g2?'Ready for handoff':'Work in progress'}/></div></div>
        {config?.provider==='demo'&&<div className="demo-disclosure"><CircleHelp size={18}/><span><strong>Offline demonstration mode.</strong> Artifacts are produced by deterministic templates, not live Gemini inference. Set <code>KATALYST_AI_PROVIDER=gemini</code> or <code>adk</code> to test actual Google models.</span></div>}
        <Stats p={project}/>
+       <VoicePanel key={project.id} projectId={project.id} enabled={!!config.live_voice_enabled} disabled={!!busy||hasUnsaved} onBusy={working=>setBusy(working?'Voice conversation active':'')}/>
        <div className="wizard-tabs">{phases.map((s,i)=><button key={s.id} className={'wizard-tab '+(tab===s.id?'current':'')} onClick={()=>setTab(s.id)}><span className={'tab-number '+(stepDone[i]?'done':'')}>{stepDone[i]?<Check size={14}/>:s.number}</span><span>{s.title}</span>{i<3&&<ChevronRight className="tab-chevron" size={16}/>}</button>)}</div>
        {tab==='capture'&&<div className="two-col">
         <section className="panel wide">

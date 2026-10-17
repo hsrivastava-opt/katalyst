@@ -142,6 +142,10 @@ class JiraCreate(BaseModel):
     fingerprint: str = Field(pattern=r'^[0-9a-f]{64}$')
     confirmed: Literal[True]
 
+class VoiceStart(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+    confirmed: Literal[True]
+
 class HandoffEmailDraft(BaseModel):
     model_config = ConfigDict(extra='forbid', str_strip_whitespace=True)
     recipients: list[str] = Field(min_length=1, max_length=10)

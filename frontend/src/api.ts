@@ -1,4 +1,4 @@
-import type {Project,ProjectInput,ProjectSummary,Config,Profile,Requirement,Story,PrototypeSpec,SRSDocument,JiraPreview,HandoffEmailDraft,HandoffEmailPreview} from './types'
+import type {Project,ProjectInput,ProjectSummary,Config,Profile,Requirement,Story,PrototypeSpec,SRSDocument,JiraPreview,HandoffEmailDraft,HandoffEmailPreview,VoiceSession} from './types'
 let tokenProvider: (()=>Promise<string|null>) = async()=>null
 export function setTokenProvider(provider:()=>Promise<string|null>){tokenProvider=provider}
 async function authenticatedFetch(path:string,opts:RequestInit={}){
@@ -20,6 +20,7 @@ export async function request<T>(path:string,opts:RequestInit={}):Promise<T>{
 }
 export const getProjects=()=>request<ProjectSummary[]>('/projects')
 export const getProject=(id:string)=>request<Project>('/projects/'+id)
+export const startVoiceSession=(id:string)=>request<VoiceSession>(`/projects/${id}/voice/session`,{method:'POST',body:JSON.stringify({confirmed:true})})
 export const getConfig=async()=>{const response=await fetch('/api/config');if(!response.ok)throw await responseError(response);return response.json() as Promise<Config>}
 export const getMe=()=>request<Profile>('/me')
 export const createProject=(input:ProjectInput)=>request<Project>('/projects',{method:'POST',body:JSON.stringify(input)})

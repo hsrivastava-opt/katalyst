@@ -91,6 +91,7 @@ def test_profile_owner_metadata_and_dashboard(firebase_client):
     ('GET', '/jira/preview', None),
     ('POST', '/jira/create', {'fingerprint': 'a'*64, 'confirmed': True}),
     ('POST', '/email/preview', {'recipients': ['alice@example.com'], 'subject': 'Handoff', 'body': 'Review attached'}),
+    ('POST', '/voice/session', {'confirmed': True}),
     ('POST', '/email/send', {'recipients': ['alice@example.com'], 'subject': 'Handoff', 'body': 'Review attached', 'fingerprint': 'a'*64, 'confirmed': True}),
     ('POST', '/approvals/g0', {'artifact_version': 1, 'decision': 'approved'}),
     ('POST', '/approvals/g1', {'artifact_version': 1, 'decision': 'approved'}),
