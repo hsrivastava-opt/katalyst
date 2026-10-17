@@ -1,0 +1,27 @@
+# Secrets and local data
+.env
+.env.*
+data/
+*.sqlite
+*.sqlite3
+*.db
+*.pem
+*.key
+
+# Python
+.venv/
+.venv-live/
+__pycache__/
+*.pyc
+.pytest_cache/
+*.egg-info/
+
+# Node
+node_modules/
+frontend/dist/
+*.tsbuildinfo
+
+# Editor and OS
+.DS_Store
+.vscode/
+.idea/
