@@ -16,6 +16,7 @@ autonomous development team or enterprise-certified platform**.
 
 - **Live application:** https://katalyst-mvp-861461836467.asia-south1.run.app/
 - **Public source:** https://github.com/hsrivastava-opt/katalyst
+- **Demo video:** https://www.youtube.com/watch?v=tZIYwC7goaM
 - **Automated checks:** https://github.com/hsrivastava-opt/katalyst/actions
 - **API reference:** [docs/API.md](docs/API.md); interactive `/docs` on a running backend.
 - **Setup and integrations:** [docs/FOUNDATION_SETUP.md](docs/FOUNDATION_SETUP.md).
@@ -28,8 +29,8 @@ autonomous development team or enterprise-certified platform**.
 - **Sample upload:** [onboarding stakeholder notes](docs/examples/onboarding-notes.txt)
   provide fictional input for the document-to-requirements workflow.
 
-The presentation PDF and demonstration video are separate submission deliverables;
-this repository does not currently include those deliverables or links to them.
+The presentation PDF is a separate submission deliverable. The demonstration
+video is linked above and hosted on YouTube, not stored in this repository.
 Repository creation dates alone do not prove compliance with a hackathon's
 fresh-code timeline; provenance must be established separately by the submitter.
 
