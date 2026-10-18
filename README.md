@@ -96,6 +96,27 @@ keys. The Firebase UID is an account identifier, not a login credential.
 Integration restrictions do not prevent the core prototype and ZIP workflow.
 There is no admin-access screen or project-sharing UI.
 
+### Private evaluator credentials
+
+**Testing access only:** no working username or password is published in this
+repository. Reviewers who need all implemented features should request a
+dedicated evaluation account through the submission's private evaluator-access
+channel. Any evaluation credentials must be supplied privately, not through
+public GitHub issues, commits or comments. Never share your personal password,
+Firebase ID token or API keys.
+
+A dedicated all-feature evaluation account has not yet been configured.
+Before supplying it, the submitter must verify login and authorize its Firebase
+UID separately for **Ask KATALYST voice, Jira creation and SMTP handoff**.
+Authorization is limited to that account's own projects; it does not grant
+administrative access to other users' data.
+
+Once credentials are privately provided, use the account email in the **Email**
+field and the supplied password in **Password** on the normal login screen.
+Use only non-sensitive test information. Jira creation and email delivery perform
+real external actions after preview and explicit confirmation; Gemini quota
+limits still apply. Email recipients must be active registered KATALYST users.
+
 ### Suggested evaluation scenario
 
 Create an **Office Supply Purchasing** project with this brief:
