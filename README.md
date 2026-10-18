@@ -23,6 +23,10 @@ autonomous development team or enterprise-certified platform**.
 - **Restrictions and roadmap:** [docs/LIMITATIONS_AND_NEXT_STEPS.md](docs/LIMITATIONS_AND_NEXT_STEPS.md).
 - **Evidence and verification boundaries:** [docs/IMPLEMENTATION_STATUS.md](docs/IMPLEMENTATION_STATUS.md).
 - **AI evaluation approach:** [docs/DEMO_AND_BENCHMARKS.md](docs/DEMO_AND_BENCHMARKS.md).
+- **Start contributing:** [CONTRIBUTING.md](CONTRIBUTING.md) covers development,
+  tests, code navigation and the pull-request checklist.
+- **Sample upload:** [onboarding stakeholder notes](docs/examples/onboarding-notes.txt)
+  provide fictional input for the document-to-requirements workflow.
 
 The presentation PDF and demonstration video are separate submission deliverables;
 this repository does not currently include those deliverables or links to them.

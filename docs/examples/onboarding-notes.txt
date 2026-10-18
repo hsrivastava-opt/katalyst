@@ -1,0 +1,28 @@
+Northstar Services - new starter process notes
+Fictional input for local development and evaluation
+
+HR keeps the joining list in a spreadsheet. Managers reply over email and IT has
+a separate preparation checklist. We need to see who is waiting for a decision
+and what still needs doing before a person starts.
+
+HR should enter a name, email, start date and department. Departments for now are
+Engineering, Finance, HR and Operations. HR wants work email required before
+submission, but another suggestion was to accept a personal address first.
+That decision is not settled.
+
+The manager should approve a request or send it back for corrections. Sending
+it back does not mean cancelling the employee's joining. Make the review outcome
+visible. Picking the correct manager automatically can wait; the first walkthrough
+can have one person act as manager.
+
+After approval, track equipment, system access and the welcome session separately.
+Keep the decision and checklist ticks when we reopen the request. The portal
+does not create real accounts or order equipment.
+
+Someone suggested automatic approval after two days, but HR did not agree.
+Do not treat that suggestion as an approved policy. Substitute approvers,
+contractor inclusion and record retention still need clarification.
+
+No payroll, banking details, identity documents or employee self-service in the
+first version. We want a simple intake, approval and checklist walkthrough to
+review together before deciding the wider implementation scope.
